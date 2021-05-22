@@ -1,6 +1,5 @@
 export class UserModel {
     public id: any;
-    public username: string;
-    public email: string;
+    public userName: string;
     public password: any;
 }

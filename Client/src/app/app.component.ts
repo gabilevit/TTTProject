@@ -1,4 +1,7 @@
 import { Component } from '@angular/core';
+import { Router } from '@angular/router';
+import { UserModel } from './models/user.model';
+import { UsersService } from './users.service';
 
 @Component({
   selector: 'app-root',
@@ -7,4 +10,17 @@ import { Component } from '@angular/core';
 })
 export class AppComponent {
   title = 'Client';
+  currentUser: UserModel;
+
+  constructor(
+    private router: Router,
+    private userService: UsersService
+  ) {
+    this.userService.currentUser.subscribe(x => this.currentUser = x);
+  }
+
+  logout() {
+    this.userService.logout();
+    this.router.navigate(['/login']);
+  }
 }

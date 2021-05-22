@@ -1,0 +1,6 @@
+npm install moongoDB
+npm install mongoose
+npm install nodemon
+npm install bcrypt
+npm  install ngx-socket-io
+npm  install socket-io  
