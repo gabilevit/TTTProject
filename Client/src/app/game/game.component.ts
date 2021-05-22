@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Socket } from 'ngx-socket-io';
+import { UsersService } from '../users.service';
 
 @Component({
   selector: 'app-game',
@@ -8,17 +9,19 @@ import { Socket } from 'ngx-socket-io';
 })
 export class GameComponent implements OnInit {
 
-  constructor(private socket: Socket) { }
+  constructor(private socket: Socket, private userService: UsersService) { }
 
   btns = document.getElementsByClassName('btn');
   senderRole: string;
   reciverRole: string;
+  myTurn: any;
   turn: string;
   isGameWon: boolean;
   isGameTie: boolean;
 
   ngOnInit(): void {
 
+    var sender = this.userService.currUserModel.userName;
     for (let i = 0; i < this.btns.length; i++) {
       const btn = this.btns[i];
       btn.addEventListener('click', () => {
@@ -38,18 +41,27 @@ export class GameComponent implements OnInit {
           alert(`GAME OVER! let's start again...`);
         }
         this.changeTurn();
+        this.socket.emit('changeTurn', this.turn);
       });
     }
 
-    this.socket.on('sendDataToGame', (data) => {
-      this.socket.emit('startGame', data);
-    })
+    this.socket.emit('startGame', {
+      user: sender
+    });
+    // this.socket.on('sendDataToGame', (data) => {
+    //   console.log(data);
+    // })
 
     this.socket.on('getRoles', (data) => {
-      console.log(data + 'line 49');
+      console.log('line 49');
       this.senderRole = data.senderRole,
-        this.reciverRole = data.reciverRole
+      this.reciverRole = data.reciverRole,
       this.turn = data.turn
+      if(sender == data.sender){
+        this.myTurn == this.senderRole;
+      } else{
+        this.myTurn == this.reciverRole;
+      }
     })
   }
 

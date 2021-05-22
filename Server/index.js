@@ -56,39 +56,46 @@ io.on('connection', (socket) => {
     })
 
     socket.on('inviteToPlay', (data) => {
-        console.log(data);
+        //console.log(data);
         priveGameRoomsNumbers[data.sender] = `Welcome to room number ${roomNumber}`;
         priveGameRoomsNumbers[data.reciver] = `Welcome to room number ${roomNumber}`;
         privateGameRommsContestens[priveGameRoomsNumbers[data.sender]] = data;
         socket.join(priveGameRoomsNumbers[data.sender]);
-        console.log(usersNames);
-        console.log(usersNames[data.reciver]);
+        //console.log(usersNames);
+        //console.log(usersNames[data.reciver]);
         io.to(usersNames[data.reciver]).emit('gotInvite', data);
 
     })
 
-    socket.on('redirectReciverToGame', (data) => {
-        console.log(data);
+    socket.on('redirectReciverToGame', (data) => {       
+        socket.join(priveGameRoomsNumbers[data.reciver]);
         privateGameRommsContestens[priveGameRoomsNumbers[data.reciver]] = data;
-        io.to(usersNames[data.reciver]).emit('redirectSenderToGame', data);
+        io.to(usersNames[data.reciver]).emit('redirectSenderToGame');
+    })
+
+    socket.on('sendDataToServer', (data) => {
+        console.log(data);
+        console.log('send data to game');
+        io.to(priveGameRoomsNumbers[data.sender]).emit('sendDataToGame', data);
+        //io.emit('sendDataToGame', data);
     })
 
     socket.on('startGame', (data) =>{
-        console.log(`the start game data ${data}`)
+        console.log(data);
         if(getRandomInt(2) == 0){
             //socket.join(priveGameRoomsNumbers[data.sender]);
-            io.to(priveGameRoomsNumbers[data.sender]).emit('getRoles', {
-                sender: data.sender,
-                reciver: data.reciver,
+            io.to(priveGameRoomsNumbers[data.user]).emit('getRoles', {
+                //sender: data.sender,
+                //reciver: data.reciver,
                 senderRole: 'X',
                 reciverRole: 'O',
                 turn: 'X'
             })
         } else{
             //socket.join(priveGameRoomsNumbers[data.sender]);
-            io.to(usersNames[data.sender]).emit('getRoles', {
+            io.to(priveGameRoomsNumbers[data.user]).emit('getRoles', {
                 sender: data.sender,
-                reciver: data.reciver,
+                //reciver: data.reciver,
                 senderRole: 'O',
                 reciverRole: 'X',
                 turn: 'X'

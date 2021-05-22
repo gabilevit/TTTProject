@@ -29,27 +29,28 @@ export class MenuComponent implements OnInit {
     });
 
     this.socket.on('gotInvite', (data) => {
-      this.userSender = data.sender;
+      this.userSender = data.sender;//fridman
       this.isGotInvite = true
     })
 
-    this.socket.on('redirectSenderToGame', (data) => {
-      this.socket.emit('sendDataToGame', data);
+    this.socket.on('redirectSenderToGame', () => {
+      //console.log(data);
+      //this.socket.emit('sendDataToServer', data);
       this.router.navigate(['/game']);
     })
   }
 
   inviteToPlay(userName){
     this.socket.emit('inviteToPlay', {
-      sender: this.userService.currUserModel.userName,
-      reciver: userName
+      sender: this.userService.currUserModel.userName,//fridman
+      reciver: userName//angel
     });
   }
 
   redirectToGame(userSender){
     this.socket.emit('redirectReciverToGame',{
-      sender: this.userService.currUserModel.userName,
-      reciver: userSender
+      sender: this.userService.currUserModel.userName,//angell
+      reciver: userSender//fridamn
     })
     this.router.navigate(['/game']);
   }
