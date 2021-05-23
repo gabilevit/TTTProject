@@ -67,7 +67,7 @@ io.on('connection', (socket) => {
 
     })
 
-    socket.on('redirectReciverToGame', (data) => {       
+    socket.on('redirectReciverToGame', (data) => {
         socket.join(priveGameRoomsNumbers[data.reciver]);
         privateGameRommsContestens[priveGameRoomsNumbers[data.reciver]] = data;
         io.to(usersNames[data.reciver]).emit('redirectSenderToGame');
@@ -80,27 +80,39 @@ io.on('connection', (socket) => {
         //io.emit('sendDataToGame', data);
     })
 
-    socket.on('startGame', (data) =>{
+    socket.on('startGame', (data) => {
         console.log(data);
-        if(getRandomInt(2) == 0){
-            //socket.join(priveGameRoomsNumbers[data.sender]);
-            io.to(priveGameRoomsNumbers[data.user]).emit('getRoles', {
-                //sender: data.sender,
-                //reciver: data.reciver,
-                senderRole: 'X',
-                reciverRole: 'O',
-                turn: 'X'
-            })
-        } else{
-            //socket.join(priveGameRoomsNumbers[data.sender]);
-            io.to(priveGameRoomsNumbers[data.user]).emit('getRoles', {
-                sender: data.sender,
-                //reciver: data.reciver,
-                senderRole: 'O',
-                reciverRole: 'X',
-                turn: 'X'
-            })
-        }
+        socket.join(priveGameRoomsNumbers[data.user]);
+        io.to(priveGameRoomsNumbers[data.user]).emit('getRoles', {
+            you: data.user,
+            //other: privateGameRommsContestens[priveGameRoomsNumbers[data.user]].reciver,
+            yourRole: 'X',
+            otherRole: 'O',
+            turn: 'X'
+        })
+        // if (getRandomInt(2) == 0) {
+        //     socket.join(priveGameRoomsNumbers[data.user]);
+        //     io.to(priveGameRoomsNumbers[data.user]).emit('getRoles', {
+        //         you: data.user,
+        //         //other: privateGameRommsContestens[priveGameRoomsNumbers[data.user]].reciver,
+        //         yourRole: 'X',
+        //         otherRole: 'O',
+        //         turn: 'X'
+        //     })
+        // } else {
+        //     socket.join(priveGameRoomsNumbers[data.user]);
+        //     io.to(priveGameRoomsNumbers[data.user]).emit('getRoles', {
+        //         you: data.user,
+        //         //other: privateGameRommsContestens[priveGameRoomsNumbers[data.reciver]].reciver,
+        //         yourRole: 'O',
+        //         otherRole: 'X',
+        //         turn: 'X'
+        //     })
+        // }
+    })
+
+    socket.on('changeTurn', (data) => {
+        io.to(priveGameRoomsNumbers[data.user]).emit('updateMove');
     })
     //const socketid = socket.id;
     //users.push(socketid);

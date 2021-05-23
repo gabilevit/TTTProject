@@ -12,25 +12,28 @@ export class GameComponent implements OnInit {
   constructor(private socket: Socket, private userService: UsersService) { }
 
   btns = document.getElementsByClassName('btn');
-  senderRole: string;
-  reciverRole: string;
-  myTurn: any;
+  you: string;
+  other: string;
+  yourRole: string;
+  otherRole: string;
+  message: string;
   turn: string;
   isGameWon: boolean;
   isGameTie: boolean;
+  clickedBtn: any;
 
   ngOnInit(): void {
 
-    var sender = this.userService.currUserModel.userName;
+    var currUser = this.userService.currUserModel.userName;
     for (let i = 0; i < this.btns.length; i++) {
       const btn = this.btns[i];
       btn.addEventListener('click', () => {
+        this.clickedBtn = btn;
         if (btn.innerHTML !== '-') {
           alert('Cant use a used slot!');
           return;
         }
         console.log(this.turn);
-        btn.innerHTML = this.turn;
 
         this.isGameWon = this.checkIsGameWon();
         if (this.isGameWon) {
@@ -40,13 +43,23 @@ export class GameComponent implements OnInit {
         if (this.isGameTie) {
           alert(`GAME OVER! let's start again...`);
         }
+
         this.changeTurn();
-        this.socket.emit('changeTurn', this.turn);
+
+        this.socket.emit('changeTurn', {         
+          turn: this.turn,
+          user: currUser
+        });
+
+        this.socket.on('updateMove', () => {
+          btn.innerHTML = this.turn;
+          //this.turn = data.turn;
+        })
       });
     }
 
     this.socket.emit('startGame', {
-      user: sender
+      user: currUser
     });
     // this.socket.on('sendDataToGame', (data) => {
     //   console.log(data);
@@ -54,15 +67,22 @@ export class GameComponent implements OnInit {
 
     this.socket.on('getRoles', (data) => {
       console.log('line 49');
-      this.senderRole = data.senderRole,
-      this.reciverRole = data.reciverRole,
-      this.turn = data.turn
-      if(sender == data.sender){
-        this.myTurn == this.senderRole;
+      this.you = data.you;
+      this.other = data.other;
+      this.yourRole = data.yourRole;
+      this.otherRole = data.otherRole;
+      this.turn = data.turn;
+      if(this.yourRole == 'X'){
+        this.message = `${this.you} starts!`
       } else{
-        this.myTurn == this.reciverRole;
+        this.message = `${this.other} starts!`
       }
-    })
+      // if(currUser == data.sender){
+      //   this.myTurn == this.yourRole;
+      // } else{
+      //   this.myTurn == this.otherRole;
+      // }
+    });
   }
 
   changeTurn() {
