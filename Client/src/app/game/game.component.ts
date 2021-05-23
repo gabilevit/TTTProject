@@ -12,12 +12,16 @@ export class GameComponent implements OnInit {
   constructor(private socket: Socket, private userService: UsersService) { }
 
   btns = document.getElementsByClassName('btn');
+  myRole: string;
+  reciverRole: string;
   you: string;
   other: string;
   yourRole: string;
   otherRole: string;
   message: string;
   turn: string;
+  messageText: string
+  messageArr: Array<{user:string,message:string}> = [];
   isGameWon: boolean;
   isGameTie: boolean;
   clickedBtn: any;
@@ -33,7 +37,8 @@ export class GameComponent implements OnInit {
           alert('Cant use a used slot!');
           return;
         }
-        console.log(this.turn);
+        //console.log(this.turn);
+        //btn.innerHTML = this.turn;
 
         this.isGameWon = this.checkIsGameWon();
         if (this.isGameWon) {
@@ -44,45 +49,36 @@ export class GameComponent implements OnInit {
           alert(`GAME OVER! let's start again...`);
         }
 
-        this.changeTurn();
-
-        this.socket.emit('changeTurn', {         
-          turn: this.turn,
-          user: currUser
-        });
-
-        this.socket.on('updateMove', () => {
-          btn.innerHTML = this.turn;
-          //this.turn = data.turn;
+        this.socket.emit('emitMove', {
+          user: currUser,
+          btnEmit: btn,
+          sighRole: this.myRole
         })
+        //this.changeTurn();
       });
     }
 
     this.socket.emit('startGame', {
       user: currUser
     });
-    // this.socket.on('sendDataToGame', (data) => {
-    //   console.log(data);
-    // })
 
     this.socket.on('getRoles', (data) => {
-      console.log('line 49');
-      this.you = data.you;
-      this.other = data.other;
-      this.yourRole = data.yourRole;
-      this.otherRole = data.otherRole;
-      this.turn = data.turn;
-      if(this.yourRole == 'X'){
-        this.message = `${this.you} starts!`
-      } else{
-        this.message = `${this.other} starts!`
-      }
-      // if(currUser == data.sender){
-      //   this.myTurn == this.yourRole;
-      // } else{
-      //   this.myTurn == this.otherRole;
-      // }
-    });
+      console.log('dfsdf00');
+      console.log(data);
+      console.log(data.myRole);
+      this.myRole = data.myRole;
+    })
+
+    this.socket.on('updateMove', (data) => {
+      var btn = data.btnEmit;
+      //btn.innerHTML = this.myRole;
+      console.log(this.myRole);
+      this.turn = this.myRole;
+    })
+
+    this.socket.on('newMsg', (data) => {
+      this.messageArr.push(data);
+    })
   }
 
   changeTurn() {
@@ -121,6 +117,13 @@ export class GameComponent implements OnInit {
   getIsLineMatches(l1, l2, l3) {
     if (this.btns[l1].innerHTML === '-' || this.btns[l2].innerHTML === '-' || this.btns[l3].innerHTML === '-') return false;
     return this.btns[l1].innerHTML === this.btns[l2].innerHTML && this.btns[l2].innerHTML === this.btns[l3].innerHTML;
+  }
+
+  sendMsg() {
+    this.socket.emit('message', {
+      user: this.userService.currUserModel.userName,
+      message: this.messageText
+    })
   }
 }
 
