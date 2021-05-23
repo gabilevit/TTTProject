@@ -83,39 +83,25 @@ io.on('connection', (socket) => {
     socket.on('startGame', (data) => {
         console.log(data);
         socket.join(priveGameRoomsNumbers[data.user]);
-        io.to(priveGameRoomsNumbers[data.user]).emit('getRoles', {
-            you: data.user,
-            //other: privateGameRommsContestens[priveGameRoomsNumbers[data.user]].reciver,
-            yourRole: 'X',
-            otherRole: 'O',
-            turn: 'X'
-        })
-        // if (getRandomInt(2) == 0) {
-        //     socket.join(priveGameRoomsNumbers[data.user]);
-        //     io.to(priveGameRoomsNumbers[data.user]).emit('getRoles', {
-        //         you: data.user,
-        //         //other: privateGameRommsContestens[priveGameRoomsNumbers[data.user]].reciver,
-        //         yourRole: 'X',
-        //         otherRole: 'O',
-        //         turn: 'X'
-        //     })
-        // } else {
-        //     socket.join(priveGameRoomsNumbers[data.user]);
-        //     io.to(priveGameRoomsNumbers[data.user]).emit('getRoles', {
-        //         you: data.user,
-        //         //other: privateGameRommsContestens[priveGameRoomsNumbers[data.reciver]].reciver,
-        //         yourRole: 'O',
-        //         otherRole: 'X',
-        //         turn: 'X'
-        //     })
-        // }
+        if(data.user == privateGameRommsContestens[priveGameRoomsNumbers[data.user]].reciver) {
+            io.to(priveGameRoomsNumbers[data.user]).emit('getRoles', {
+                myRole: 'X'
+            })
+        } else {
+            io.to(priveGameRoomsNumbers[data.user]).emit('getRoles', {
+                myRole: 'O'
+            })
+        }
     })
 
-    socket.on('changeTurn', (data) => {
-        io.to(priveGameRoomsNumbers[data.user]).emit('updateMove');
+    socket.on('emitMove', (data) => {
+        socket.join(priveGameRoomsNumbers[data.user]);
+        io.to(priveGameRoomsNumbers[data.user]).emit('updateMove', data);
     })
-    //const socketid = socket.id;
-    //users.push(socketid);
+    
+    socket.on('message', (data) => {
+        io.in(priveGameRoomsNumbers[data.user]).emit('newMsg', data);
+    })
 })
 
 function getRandomInt(max) {

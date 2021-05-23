@@ -15,7 +15,10 @@
     <button class="btn">-</button>
     <button class="btn">-</button>
 </div>
+<div *ngfor="let item of messageArr">
+    <span><strong>{{item.user}} : </strong>{{item.message}}</span>
+</div>
 <div>
-    <textarea aria-placeholder="Chat"></textarea>
-    <button>Send</button>
+    <textarea aria-placeholder="Chat" [(ngModel)]="messageText"></textarea>
+    <button (click)="sendMsg">Send</button>
 </div>

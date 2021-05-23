@@ -12,12 +12,15 @@ export class GameComponent implements OnInit {
   constructor(private socket: Socket, private userService: UsersService) { }
 
   btns = document.getElementsByClassName('btn');
+  myRole: string;
   you: string;
   other: string;
   yourRole: string;
   otherRole: string;
   message: string;
   turn: string;
+  messageText:string;
+  messageArr: Array<{user:string,message:string}> = [];
   isGameWon: boolean;
   isGameTie: boolean;
   clickedBtn: any;
@@ -66,23 +69,13 @@ export class GameComponent implements OnInit {
     // })
 
     this.socket.on('getRoles', (data) => {
-      console.log('line 49');
-      this.you = data.you;
-      this.other = data.other;
-      this.yourRole = data.yourRole;
-      this.otherRole = data.otherRole;
-      this.turn = data.turn;
-      if(this.yourRole == 'X'){
-        this.message = `${this.you} starts!`
-      } else{
-        this.message = `${this.other} starts!`
-      }
-      // if(currUser == data.sender){
-      //   this.myTurn == this.yourRole;
-      // } else{
-      //   this.myTurn == this.otherRole;
-      // }
+      this.myRole = data.myRole;
     });
+
+    this.socket.on('newMsg', (data) => {
+      this.messageArr.push(data);
+      console.log(this.messageArr);
+    })
   }
 
   changeTurn() {
@@ -121,6 +114,13 @@ export class GameComponent implements OnInit {
   getIsLineMatches(l1, l2, l3) {
     if (this.btns[l1].innerHTML === '-' || this.btns[l2].innerHTML === '-' || this.btns[l3].innerHTML === '-') return false;
     return this.btns[l1].innerHTML === this.btns[l2].innerHTML && this.btns[l2].innerHTML === this.btns[l3].innerHTML;
+  }
+
+  sendMsg() {
+    this.socket.emit('message', {
+      user: this.userService.currUserModel.userName,
+      message: this.messageText
+    })
   }
 }
 
