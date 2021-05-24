@@ -1,10 +1,12 @@
 <p>menu works!</p>
 <div>
   <div *ngFor="let user of UserList; index as i">
-    <button (click)="inviteToPlay(user)" #userid>{{i+1}}/{{UserList.length}}. {{user}} </button>
+    <button class="btn btn-primary" (click)="inviteToPlay(user)" #userid>{{i+1}}/{{UserList.length}}. {{user}} </button>
   </div>
-
-  <div *ngIf="isGotInvite">
-    <button (click)="redirectToGame(userSender)">You got invite from {{userSender}}</button>
+  <div class="container" *ngIf="isGotInvite">
+    <div class="form-group">You got invite from {{userSender}}
+      <button (click)="redirectToGame(userSender)">Accept</button>
+      <button (click)="cancelInvite(userSender)">Decline</button>
+    </div>
   </div>
 </div>

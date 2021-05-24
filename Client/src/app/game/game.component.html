@@ -1,24 +1,28 @@
 <p>game works!</p>
-<h2>{{message}}</h2>
+<h2>You are {{myRole}}</h2>
 <div>
-    <button class="btn">-</button>
-    <button class="btn">-</button>
-    <button class="btn">-</button>
+    <button class="btn" value="0" (click)="sendPickSquare(0)">-</button>
+    <button class="btn" value="1" (click)="sendPickSquare(1)">-</button>
+    <button class="btn" value="2" (click)="sendPickSquare(2)">-</button>
 </div>
 <div>
-    <button class="btn">-</button>
-    <button class="btn">-</button>
-    <button class="btn">-</button>
+    <button class="btn" value="3" (click)="sendPickSquare(3)">-</button>
+    <button class="btn" value="4" (click)="sendPickSquare(4)">-</button>
+    <button class="btn" value="5" (click)="sendPickSquare(5)">-</button>
 </div>
 <div>
-    <button class="btn">-</button>
-    <button class="btn">-</button>
-    <button class="btn">-</button>
+    <button class="btn" value="6" (click)="sendPickSquare(6)">-</button>
+    <button class="btn" value="7" (click)="sendPickSquare(7)">-</button>
+    <button class="btn" value="8" (click)="sendPickSquare(8)">-</button>
 </div>
-<div *ngfor="let item of messageArr">
+<div *ngFor="let item of messageArr">
     <span><strong>{{item.user}} : </strong>{{item.message}}</span>
 </div>
 <div>
     <textarea aria-placeholder="Chat" [(ngModel)]="messageText"></textarea>
-    <button (click)="sendMsg">Send</button>
+    <button (click)="sendMsg()">Send</button>
+</div>
+<div>
+    <button (click)="rematch()" *ngIf="askRematch">Ask for rematch</button>
+    <button (click)="acceptRematch()" *ngIf="gotRematch">{{userRematch}} is asking for a rematch</button>
 </div>
