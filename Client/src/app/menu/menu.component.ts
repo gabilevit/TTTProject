@@ -38,9 +38,17 @@ export class MenuComponent implements OnInit {
       //this.socket.emit('sendDataToServer', data);
       this.router.navigate(['/game']);
     })
+
+    this.socket.on('gotDecline', (data) => {
+      alert(data.message);
+    })
   }
 
   inviteToPlay(userName){
+    if(userName == this.userService.currUserModel.userName){
+      alert('You cant invite yourself');
+      return;
+    }
     this.socket.emit('inviteToPlay', {
       sender: this.userService.currUserModel.userName,//fridman
       reciver: userName//angel
@@ -49,9 +57,16 @@ export class MenuComponent implements OnInit {
 
   redirectToGame(userSender){
     this.socket.emit('redirectReciverToGame',{
-      sender: this.userService.currUserModel.userName,//angell
-      reciver: userSender//fridamn
+      sender: userSender,//fridamn
+      reciver: this.userService.currUserModel.userName,//angell
     })
     this.router.navigate(['/game']);
+  }
+
+  cancelInvite(userSender) {
+    this.isGotInvite = false;
+    this.socket.emit('cancelInvite', {
+      sender: userSender
+    })
   }
 }

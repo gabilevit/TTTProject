@@ -42,7 +42,7 @@ export class UsersService {
       }));
   }
 
-  logout() {
+   logout() {
     localStorage.removeItem('currentUser');
     this.currentUserSubject.next(null);
   }

@@ -70,7 +70,13 @@ io.on('connection', (socket) => {
     socket.on('redirectReciverToGame', (data) => {
         //console.log(data);
         privateGameRommsContestens[priveGameRoomsNumbers[data.reciver]] = data;
-        io.to(usersNames[data.reciver]).emit('redirectSenderToGame');
+        io.to(usersNames[data.sender]).emit('redirectSenderToGame');
+    })
+
+    socket.on('cancelInvite', (data) => {
+        io.to(usersNames[data.sender]).emit('gotDecline', {
+            message: `${privateGameRommsContestens[priveGameRoomsNumbers[data.sender]].reciver} has declined your invite`
+        })
     })
 
     socket.on('sendDataToServer', (data) => {
@@ -83,51 +89,42 @@ io.on('connection', (socket) => {
     
 
     socket.on('startGame', (data) => {
-        socket.join(priveGameRoomsNumbers[data.user]);
-        if (data.user == privateGameRommsContestens[priveGameRoomsNumbers[data.user]].reciver) {
-            io.to(priveGameRoomsNumbers[data.user]).emit('getRoles', {
-                myRole: 'X'              
+        socket.join(priveGameRoomsNumbers[data.user]);      
+        if(data.user == privateGameRommsContestens[priveGameRoomsNumbers[data.user]].sender) {
+            io.to(usersNames[data.user]).emit('getRoles', {
+                myRole: 'X',
+                turn: 'X',
+                otherUser: privateGameRommsContestens[priveGameRoomsNumbers[data.user]].reciver
             })
-        } else {
-            io.to(priveGameRoomsNumbers[data.user]).emit('getRoles', {
-                myRole: 'O'              
+        } else if(data.user == privateGameRommsContestens[priveGameRoomsNumbers[data.user]].reciver) {
+            io.to(usersNames[data.user]).emit('getRoles', {
+                myRole: 'O',
+                turn: 'X',
+                otherUser: privateGameRommsContestens[priveGameRoomsNumbers[data.user]].sender
             })
         }
-        //if(data.user == priveGameRoomsNumbers)
-        // if(getRandomInt(2) == 0){
-        //     //socket.join(priveGameRoomsNumbers[data.sender]);
-        //     io.to(priveGameRoomsNumbers[data.sender]).emit('getRoles', {
-        //         sender: data.sender,
-        //         reciver: data.reciver,
-        //         senderRole: 'X',
-        //         reciverRole: 'O',
-        //         turn: 'X'
-        //     })
-        // } else{
-        //     //socket.join(priveGameRoomsNumbers[data.sender]);
-        //     io.to(usersNames[data.sender]).emit('getRoles', {
-        //         sender: data.sender,
-        //         reciver: data.reciver,
-        //         senderRole: 'O',
-        //         reciverRole: 'X',
-        //         turn: 'X'
-        //     })
-        // }
     })
 
-    socket.on('emitMove', (data) => {
-        socket.join(priveGameRoomsNumbers[data.user]);
+    socket.on('emitMove', (data) => { 
         io.to(priveGameRoomsNumbers[data.user]).emit('updateMove', data);
     })
 
+    socket.on('requestRematch', (data) => {
+        if(privateGameRommsContestens[priveGameRoomsNumbers[data.user]].sender == data.user) {
+            io.to(usersNames[privateGameRommsContestens[priveGameRoomsNumbers[data.user]].reciver]).emit('gotRematch', data);
+        } else {
+            io.to(usersNames[privateGameRommsContestens[priveGameRoomsNumbers[data.user]].sender]).emit('gotRematch', data);
+        }
+        
+    })
+
+    socket.on('emitRematch', (data) => {
+        io.to(priveGameRoomsNumbers[data.user]).emit('restartGame');
+    })
+    
     socket.on('message', (data) => {
         io.in(priveGameRoomsNumbers[data.user]).emit('newMsg', data);
     })
-    socket.on('changeTurn', (data) => {
-        io.to(priveGameRoomsNumbers[data.user]).emit('updateMove');
-    })
-    //const socketid = socket.id;
-    //users.push(socketid);
 })
 
 

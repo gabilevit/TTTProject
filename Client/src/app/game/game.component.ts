@@ -13,72 +13,102 @@ export class GameComponent implements OnInit {
 
   btns = document.getElementsByClassName('btn');
   myRole: string;
-  reciverRole: string;
-  you: string;
-  other: string;
-  yourRole: string;
-  otherRole: string;
   message: string;
   turn: string;
-  messageText: string
-  messageArr: Array<{user:string,message:string}> = [];
+  messageText: string;
+  messageArr: Array<{ user: string, message: string }> = [];
   isGameWon: boolean;
   isGameTie: boolean;
-  clickedBtn: any;
+  askRematch: boolean = false;
+  gotRematch: boolean = false;
+  currUser = this.userService.currUserModel.userName;
+  otherUser: string;
+  userRematch: string;
 
   ngOnInit(): void {
-
-    var currUser = this.userService.currUserModel.userName;
-    for (let i = 0; i < this.btns.length; i++) {
-      const btn = this.btns[i];
-      btn.addEventListener('click', () => {
-        this.clickedBtn = btn;
-        if (btn.innerHTML !== '-') {
-          alert('Cant use a used slot!');
-          return;
-        }
-        //console.log(this.turn);
-        //btn.innerHTML = this.turn;
-
-        this.isGameWon = this.checkIsGameWon();
-        if (this.isGameWon) {
-          alert(`Player won!`);
-        }
-        this.isGameTie = this.checkIfGameTie();
-        if (this.isGameTie) {
-          alert(`GAME OVER! let's start again...`);
-        }
-
-        this.socket.emit('emitMove', {
-          user: currUser,
-          btnEmit: btn,
-          sighRole: this.myRole
-        })
-        //this.changeTurn();
-      });
-    }
+    //var currUser = this.userService.currUserModel.userName;
+    // for (let i = 0; i < this.btns.length; i++) {
+    //   const btn = this.btns[i];
+    //   btn.addEventListener('click', () => {
+    //     console.log(this.myRole);
+    //     if(this.turn == this.myRole){
+    //       if(this.isXTurn){
+    //         this.socket.emit('emitMove', {
+    //           user: currUser,
+    //           btnEmit: btn.innerHTML,
+    //           sighRole: this.myRole
+    //         })           
+    //       }  
+    //     } else {
+    //       alert('not ytour turn');
+    //     }             
+    //     //btn.innerHTML = this.turn;       
+    //   });
+    // }
 
     this.socket.emit('startGame', {
-      user: currUser
+      user: this.currUser
     });
 
     this.socket.on('getRoles', (data) => {
-      console.log('dfsdf00');
-      console.log(data);
-      console.log(data.myRole);
       this.myRole = data.myRole;
-    })
-
-    this.socket.on('updateMove', (data) => {
-      var btn = data.btnEmit;
-      //btn.innerHTML = this.myRole;
-      console.log(this.myRole);
-      this.turn = this.myRole;
-    })
+      this.turn = data.turn;
+      this.otherUser = data.otherUser;
+    });
 
     this.socket.on('newMsg', (data) => {
       this.messageArr.push(data);
+      console.log(this.messageArr);
     })
+
+    this.socket.on('updateMove', (data) => {
+      this.apllyMove(data.indexBtn, data.sighRole);
+    })
+
+    this.socket.on('gotRematch', (data) => {
+      this.userRematch = data.user;
+      this.gotRematch = true;
+    })
+
+    this.socket.on('restartGame', () => {
+      this.askRematch = false;
+      this.gotRematch = false;
+      this.newGame();
+    })
+  }
+
+  sendPickSquare(index) {
+    if (this.turn == this.myRole) {
+      this.socket.emit('emitMove', {
+        user: this.currUser,
+        indexBtn: index,
+        sighRole: this.myRole
+      })
+    } else {
+      alert('not your turn');
+    }
+  }
+
+  apllyMove(index, sigh) {
+    if (this.btns[index].innerHTML !== '-') {
+      alert('Cant use a used slot!');
+      return;
+    }
+    this.btns[index].innerHTML = sigh;
+
+    this.isGameWon = this.checkIsGameWon();
+    if (this.isGameWon) {
+      this.checkWhoWon();
+      this.askRematch = true;
+      return;
+    }
+    this.isGameTie = this.checkIfGameTie();
+    if (this.isGameTie) {
+      alert(`GAME OVER! its a tie!`);
+      this.askRematch = true;
+      return;
+    }
+    this.changeTurn();
   }
 
   changeTurn() {
@@ -121,10 +151,43 @@ export class GameComponent implements OnInit {
 
   sendMsg() {
     this.socket.emit('message', {
-      user: this.userService.currUserModel.userName,
+      user: this.currUser,
       message: this.messageText
     })
   }
+
+  rematch() {
+    this.askRematch = false;
+    this.socket.emit('requestRematch', {
+      user: this.currUser
+    })
+  }
+
+  acceptRematch() {
+    this.socket.emit('emitRematch', {
+      user: this.currUser
+    });
+  }
+
+  newGame() {
+    for (let i = 0; i < this.btns.length; i++) {
+      const btn = this.btns[i];
+      btn.innerHTML = '-';
+    }
+    this.turn = 'X';
+  }
+
+  checkWhoWon() {
+    if (this.turn == this.myRole) {
+      alert(`${this.currUser} Won!`)     
+    } else {
+      alert(`${this.otherUser} Won!`)      
+    }
+  }
+
+
 }
+
+
 
 
