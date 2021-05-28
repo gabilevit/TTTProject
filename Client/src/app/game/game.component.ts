@@ -21,30 +21,11 @@ export class GameComponent implements OnInit {
   isGameTie: boolean;
   askRematch: boolean = false;
   gotRematch: boolean = false;
-  currUser = this.userService.currUserModel.userName;
+  currUser = this.userService.getUser().userName;
   otherUser: string;
   userRematch: string;
 
   ngOnInit(): void {
-    //var currUser = this.userService.currUserModel.userName;
-    // for (let i = 0; i < this.btns.length; i++) {
-    //   const btn = this.btns[i];
-    //   btn.addEventListener('click', () => {
-    //     console.log(this.myRole);
-    //     if(this.turn == this.myRole){
-    //       if(this.isXTurn){
-    //         this.socket.emit('emitMove', {
-    //           user: currUser,
-    //           btnEmit: btn.innerHTML,
-    //           sighRole: this.myRole
-    //         })           
-    //       }  
-    //     } else {
-    //       alert('not ytour turn');
-    //     }             
-    //     //btn.innerHTML = this.turn;       
-    //   });
-    // }
 
     this.socket.emit('startGame', {
       user: this.currUser
@@ -66,6 +47,7 @@ export class GameComponent implements OnInit {
     })
 
     this.socket.on('gotRematch', (data) => {
+      this.askRematch = false;
       this.userRematch = data.user;
       this.gotRematch = true;
     })

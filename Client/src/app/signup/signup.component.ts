@@ -5,6 +5,7 @@ import { UserModel } from '../models/user.model';
 import { first } from 'rxjs/operators';
 import { Router, ActivatedRoute } from '@angular/router';
 
+
 @Component({
   selector: 'app-signup',
   templateUrl: './signup.component.html',
@@ -22,6 +23,10 @@ export class SignupComponent implements OnInit {
   log(x) { console.log(x); }
 
   createUser(userName, password) {
+    if(userName == "" || password == ""){
+      alert('Username and password is required');
+      return;
+    }
     var newUser = new UserModel();
     newUser.id = this.num++;
     newUser.userName = userName;

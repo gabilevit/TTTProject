@@ -1,12 +1,26 @@
-<p>menu works!</p>
+<div class='stripe-text'>TicTacToe game</div>
 <div>
-  <div *ngFor="let user of UserList; index as i">
-    <button class="btn btn-primary" (click)="inviteToPlay(user)" #userid>{{i+1}}/{{UserList.length}}. {{user}} </button>
+  <div id="users">Users online:
+    <div *ngFor="let user of onlineUsers; index as i">
+      <button id="usersBtn" [disabled]="userBtn === true" class="btn btn-primary" (click)="inviteToPlay(user)"
+        #userid>{{i+1}}/{{onlineUsers.length}}. {{user}} </button>
+    </div>
+  </div>
+  <div id="users">Users offline:
+    <div *ngFor="let user of offlineUsers; index as i">
+      <button id="usersBtn" disabled class="btn btn-primary" 
+        #userid>{{i+1}}/{{offlineUsers.length}}. {{user}} </button>
+    </div>
+  </div>
+  <div class="container" *ngIf="cancelInv">
+    <div class="form-group" id="waiting">Waiting for an reply...
+      <button (click)="cancelInvite()" id="cancelBtn">Cancel</button>
+    </div>
   </div>
   <div class="container" *ngIf="isGotInvite">
-    <div class="form-group">You got invite from {{userSender}}
-      <button (click)="redirectToGame(userSender)">Accept</button>
-      <button (click)="cancelInvite(userSender)">Decline</button>
+    <div class="form-group" id="inviteText">You got invite from {{userSender}}
+      <button id="acceptBtn" (click)="redirectToGame(userSender)">Accept</button>
+      <button id="declineBtn" (click)="declineInvite(userSender)">Decline</button>
     </div>
   </div>
 </div>

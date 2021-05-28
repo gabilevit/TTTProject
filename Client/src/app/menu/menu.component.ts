@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Socket } from 'ngx-socket-io';
+import { first } from 'rxjs/operators';
 import { UserModel } from '../models/user.model';
 import { UsersService } from '../users.service';
 
@@ -11,61 +12,111 @@ import { UsersService } from '../users.service';
 })
 export class MenuComponent implements OnInit {
 
-  constructor(private socket: Socket, private userService: UsersService, private router: Router) {
-    this.userService.currentUser.subscribe(x => this.currentUser = x);
-   }
+  constructor(private socket: Socket, private userService: UsersService, private router: Router) {}
 
   currentUser: UserModel;
+  userBtn: boolean = false;
+  cancelInv: boolean = false;
   userSender: any;
   userReciver: any;
-  UserList: Array<any>;
+  allUsers: Array<UserModel>;
+  onlineUsers: Array<any>;
+  offlineUsers: Array<any> = [];
+  tmpUsers: Array<any> = [];
   isGotInvite: boolean = false;
+
   ngOnInit(): void {
+    this.currentUser = this.userService.getUser();
     this.isGotInvite = false;
 
-    this.socket.on('userConected', (data) =>{
-      //console.log(data);
-      this.UserList = data;
+    this.socket.emit('emitCurrentUser', this.currentUser.userName);
+
+    this.socket.on('userConected', (data) => {
+      console.log(data);
+      this.onlineUsers = data;
     });
+    
+    this.getAllUsers();
+
+    this.socket.on('emitOfflineUsers', (offlineUsers) => {
+      this.offlineUsers = offlineUsers;
+    })
+
+    this.socket.on('userWentOffline', (offlineUsers) => {
+      console.log(offlineUsers);
+      this.offlineUsers.push(offlineUsers);
+    })
 
     this.socket.on('gotInvite', (data) => {
-      this.userSender = data.sender;//fridman
+      this.userSender = data.sender;
       this.isGotInvite = true
     })
 
     this.socket.on('redirectSenderToGame', () => {
-      //console.log(data);
-      //this.socket.emit('sendDataToServer', data);
+      this.userBtn = false;
+      this.cancelInv = false;
       this.router.navigate(['/game']);
     })
 
     this.socket.on('gotDecline', (data) => {
+      this.userBtn = false;
+      this.cancelInv = false;
       alert(data.message);
+    })
+
+    this.socket.on('senderCancelInvite', () => {
+      this.isGotInvite = false;
     })
   }
 
-  inviteToPlay(userName){
-    if(userName == this.userService.currUserModel.userName){
-      alert('You cant invite yourself');
-      return;
-    }
-    this.socket.emit('inviteToPlay', {
-      sender: this.userService.currUserModel.userName,//fridman
-      reciver: userName//angel
+  getAllUsers() {
+    this.userService.getAllUsers().pipe().subscribe(users => {
+      this.allUsers = users;
+      console.log(this.allUsers);
+      this.getAllOfflineUsers();
     });
   }
 
-  redirectToGame(userSender){
-    this.socket.emit('redirectReciverToGame',{
-      sender: userSender,//fridamn
-      reciver: this.userService.currUserModel.userName,//angell
+  getAllOfflineUsers() {
+    for (let index = 0; index < this.allUsers.length; index++) {
+      this.tmpUsers.push(this.allUsers[index].userName); 
+    }
+    console.log(this.tmpUsers);
+    this.offlineUsers = this.tmpUsers.filter(user => !this.onlineUsers.includes(user));
+    this.socket.emit('updateOfflineUsers', this.offlineUsers);
+  }
+  inviteToPlay(userName) {
+    if (userName == this.currentUser.userName) {
+      alert('You cant invite yourself');
+      return;
+    }
+    this.userBtn = true;
+    this.cancelInv = true;
+    this.socket.emit('inviteToPlay', {
+      sender: this.currentUser.userName,
+      reciver: userName
+    });
+  }
+
+  cancelInvite() {
+    this.cancelInv = false;
+    this.userBtn = false;
+    this.socket.emit('cancelInvite', {
+      sender: this.currentUser.userName
+    })
+  }
+
+  redirectToGame(userSender) {
+    this.socket.emit('redirectReciverToGame', {
+      sender: userSender,
+      reciver: this.currentUser.userName,
     })
     this.router.navigate(['/game']);
   }
 
-  cancelInvite(userSender) {
+  declineInvite(userSender) {
     this.isGotInvite = false;
-    this.socket.emit('cancelInvite', {
+    this.socket.emit('declineInvite', {
       sender: userSender
     })
   }

@@ -5,7 +5,6 @@ import { SocketIoModule, SocketIoConfig } from 'ngx-socket-io';
 
 import { AppRoutingModule} from './app-routing.module';
 import { AppComponent } from './app.component';
-import { WelcomeComponent } from './welcome/welcome.component';
 import { LoginComponent } from './login/login.component';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -18,8 +17,6 @@ const socketioConfig: SocketIoConfig = { url: 'http://localhost:1902', options: 
 @NgModule({
   declarations: [
     AppComponent,
-    //routingComponents,
-    WelcomeComponent,
     LoginComponent,
     SignupComponent,
     MenuComponent,

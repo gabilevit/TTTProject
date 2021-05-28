@@ -1,0 +1,31 @@
+#gameInfo {
+    color: black;
+    font-style: italic;
+    font-size: 20px;
+}
+
+.btn {
+    font-style: italic;
+    border-radius: 40px;
+    text-size-adjust: 80;
+    size: 80;
+    font-size: 600;
+    font-weight: 400;
+}
+
+#chat {
+    color: black;
+    font-style: italic;
+    font-size: medium;
+}
+
+#sendBtn {
+    font-style: italic;
+    font-size: 100;
+}
+
+.rematch {
+    font-style: italic;
+    border-radius: 40px;
+    background-color: royalblue;
+}

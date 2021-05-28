@@ -1,0 +1,73 @@
+.stripe-text {
+    position: relative;
+    font-size: 60px;
+    text-transform: uppercase;
+    font-weight: 900;
+    font-family: 'Catamaran', sans-serif;
+    font-style: italic;
+}
+.stripe-text:after {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    content: 'TicTacToe game';
+    background: -webkit-repeating-linear-gradient(135deg, #1534e6, #1534e6 20px, #ffed28 20px, #ffed28 40px, #b028ff 40px, #b028ff 60px, #39dbc2 60px, #39dbc2 80px);
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+    -webkit-text-stroke-width: 5.5px;
+    -webkit-text-stroke-color: rgb(18, 18, 19);
+}
+.stripe-text:before {
+    z-index: -1;
+    position: absolute;
+    content: 'TicTacToe game';
+    color: #f41fbf;
+    top: 0px;
+    left: 0px;
+    text-shadow: 5px 0px #f41fbf, 6px 1px #1534e6, 7px 2px #1534e6, 8px 3px #1534e6, 9px 4px #1534e6, 10px 5px #1534e6, 11px 6px #1534e6, 12px 7px #1534e6, 13px 8px #f41fbf, 14px 9px #f41fbf, 15px 10px #f41fbf;
+}
+
+#users {
+    font-style: italic;
+    font-size: 40px;
+    font-weight: 500;
+    color:  purple;
+    bottom: 75%;
+    left: 50%;
+
+}
+
+#usersBtn {
+    font-style: italic;
+    border-radius: 40px;
+}
+
+#inviteText {
+    color: black;
+    font-style: italic;
+    font-size: 20px;
+}
+
+#waiting {
+    color: black;
+    font-style: italic;
+    font-size: 20px;
+}
+
+#cancelBtn {
+    background-color: red;
+    font-style: italic;
+    border-radius: 40px;
+}
+#acceptBtn {
+    background-color: green;
+    font-style: italic;
+    border-radius: 40px;
+}
+
+#declineBtn {
+    background-color: red;
+    font-style: italic;
+    border-radius: 40px;
+}

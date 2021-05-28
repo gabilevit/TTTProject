@@ -77,9 +77,7 @@ module.exports = {
     },
     getAll: (req, res) => {
         User.find().then((users) => {
-            res.status(200).json({
-                users
-            })
+            res.json(users)
         }).catch(error => {
             res.status(500).json({
                 error

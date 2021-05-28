@@ -21,20 +21,22 @@ export class LoginComponent implements OnInit {
     private socket: Socket) { }
 
   ngOnInit(): void {
+
   }
 
   log(x) { console.log(x); }
-  
+
   submit(userName, password) {
     this.userService.login(userName, password)
       .pipe(first())
       .subscribe(
         data => {
           this.router.navigate(['/menu']);
-          this.userService.currUserModel = data;
-          this.emitUser(this.userService.currUserModel.userName);
+          this.userService.userConected(data);
+          this.emitUser(this.userService.getUser().userName);
         },
         error => {
+          alert('Username or password are incorrect');
           console.log('error');
         }
       );
@@ -43,13 +45,4 @@ export class LoginComponent implements OnInit {
   emitUser(userName) {
     this.socket.emit('emitCurrentUser', userName);
   }
-  // this.socket.emit("user_conncted",name)
-  // socket.on("user_conncted",(data)=>{
-  //   listofUsersNames[data]=socket.id;
-  //   listOfUsers.push(data)
-  //   io.emit("login",listOfUsers)
-  //  // io.emit('newUser', listOfUsers)
-  // })
-
-
 }
